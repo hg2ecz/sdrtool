@@ -36,7 +36,7 @@ impl Sdrtcpcli {
         Sdrtcpcli { tcpstream: TcpStream::connect(ip_port).unwrap() }
     }
 
-    pub fn get(&mut self) -> Vec<Complex<f32>> {
+    pub fn read_u8(&mut self) -> Vec<Complex<f32>> {
         let mut resvec: Vec<Complex<f32>> = vec![];
         let mut buffer = [0u8; 1<<13];
         self.tcpstream.read(&mut buffer).unwrap();
