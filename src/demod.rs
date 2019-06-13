@@ -9,6 +9,8 @@ pub struct Sdrdemod {
     coeff: Vec<f32>,
     decimate: usize,
     decimate_pos: usize,
+
+    deemp_last_output: f32,
 }
 
 impl Sdrdemod {
@@ -20,6 +22,7 @@ impl Sdrdemod {
             coeff: coeff.clone(),
             decimate: decimate,
             decimate_pos: 0,
+            deemp_last_output: 0.,
         }
     }
 
@@ -46,5 +49,22 @@ impl Sdrdemod {
         }
         self.sampledecimbuf.drain(..pos+self.decimate);
         return resvec;
+    }
+
+    pub fn deemphasis_wfm(&mut self, input: &Vec<f32>, tau: f32, sample_rate: u32) -> Vec<f32> {
+        // typical time constant (tau) values:
+        // WFM transmission in USA: 75 us -> tau = 75e-6
+        // WFM transmission in EU:  50 us -> tau = 50e-6
+        // More info at: http://www.cliftonlaboratories.com/fm_receivers_and_de-emphasis.htm
+        // Simulate in octave: tau=75e-6; dt=1/48000; alpha = dt/(tau+dt); freqz([alpha],[1 -(1-alpha)])
+        let dt = 1.0/sample_rate as f32;
+        let alpha = dt/(tau+dt);
+        let mut output = vec![];
+        output.push ( alpha*input[0]+(1.-alpha)*self.deemp_last_output );
+        for i in 1..input.len() { //@deemphasis_wfm_ff
+            output.push( alpha*input[i]+(1.-alpha)*output[i-1] ); //this is the simplest IIR LPF
+        }
+        self.deemp_last_output = *output.last().unwrap();
+        return output;
     }
 }
