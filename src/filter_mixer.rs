@@ -7,7 +7,6 @@ pub struct Sdrfilter {
     sampledecimmixbuf: Vec<Complex<f32>>, // for decimate_mix func
     coeff: Vec<Complex<f32>>,
     decimate: usize,
-    decimate_pos: usize,
     oscillator: Complex<f64>,
     oscillator_phase: Complex<f64>,
 }
@@ -20,7 +19,6 @@ impl Sdrfilter {
              sampledecimmixbuf: Vec::new(),
              coeff: coeff.clone(),
              decimate: decimate,
-             decimate_pos: 0,
              oscillator: Complex::new(1., 0.),
              oscillator_phase: Complex::new(0., 0.),
         }
@@ -59,7 +57,7 @@ impl Sdrfilter {
         if self.decimate > self.coeff.len() { return resvec; }
         self.sampledecimbuf.extend(sample);
         let mut pos = 0;
-        for i in (self.decimate_pos..self.sampledecimbuf.len()-self.coeff.len()).step_by(self.decimate) {
+        for i in (0..self.sampledecimbuf.len()-self.coeff.len()).step_by(self.decimate) {
             resvec.push ( self.sampledecimbuf[i..i+self.coeff.len()].iter().zip(&self.coeff).map(|(sa, co)| sa * co).sum() );
             pos=i;
         }
@@ -76,7 +74,7 @@ impl Sdrfilter {
             self.oscillator *= self.oscillator_phase;
         }
         let mut pos = 0;
-        for i in (self.decimate_pos..self.sampledecimmixbuf.len()-self.coeff.len()).step_by(self.decimate) {
+        for i in (0..self.sampledecimmixbuf.len()-self.coeff.len()).step_by(self.decimate) {
             resvec.push ( self.sampledecimmixbuf[i..i+self.coeff.len()].iter().zip(&self.coeff).map(|(sa, co)| sa * co).sum() );
             pos=i;
         }
