@@ -3,7 +3,7 @@ use num_complex::Complex;
 use std::io::{self, Read, Write};
 use std::net::{TcpStream};
 
-fn read_stdin_u8() -> Vec<Complex<f32>> {
+pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     let mut buffer = [0u8; 1<<13];
     let mut resvec: Vec<Complex<f32>> = vec![];
     io::stdin().read(&mut buffer).unwrap();
@@ -13,7 +13,7 @@ fn read_stdin_u8() -> Vec<Complex<f32>> {
     return resvec;
 }
 
-fn write_stdout_i16(soundout: Vec<i16>) {
+pub fn write_stdout_i16(soundout: Vec<i16>) {
     let mut outbytes = vec![];
     for x in soundout {
         outbytes.push((x & 0xff) as u8);
