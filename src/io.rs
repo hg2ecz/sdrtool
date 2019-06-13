@@ -28,7 +28,7 @@ pub struct Sdrtcpcli {
 }
 
 impl Sdrtcpcli {
-    fn new(ip_port: &str) -> Sdrtcpcli {
+    pub fn new(ip_port: &str) -> Sdrtcpcli {
         Sdrtcpcli { tcpstream: TcpStream::connect(ip_port).unwrap() }
     }
 
