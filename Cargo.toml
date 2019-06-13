@@ -1,0 +1,8 @@
+[package]
+name = "sdrtool"
+version = "0.1.0"
+authors = ["Zsolt Krüpl <hg2ecz@ham.hu>"]
+edition = "2018"
+
+[dependencies]
+num-complex = "*"
