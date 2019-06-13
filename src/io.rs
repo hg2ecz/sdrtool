@@ -13,18 +13,6 @@ fn read_stdin_u8() -> Vec<Complex<f32>> {
     return resvec;
 }
 
-// Parameter: "ipaddress:port"
-fn read_tcp_u8(ip_port: &str) -> Vec<Complex<f32>> {
-    let mut resvec: Vec<Complex<f32>> = vec![];
-    let mut stream = TcpStream::connect(ip_port).unwrap();
-    let mut buffer = [0u8; 1<<13];
-    stream.read(&mut buffer).unwrap();
-    for i in (0..buffer.len()).step_by(2) {
-        resvec.push( Complex::new(buffer[i] as f32, buffer[i+1] as f32) );
-    }
-    return resvec;
-}
-
 fn write_stdout_i16(soundout: Vec<i16>) {
     let mut outbytes = vec![];
     for x in soundout {
@@ -32,4 +20,25 @@ fn write_stdout_i16(soundout: Vec<i16>) {
         outbytes.push((x >> 8) as u8);
     }
     io::stdout().write_all(&outbytes).unwrap();
+}
+
+// Parameter: "ipaddress:port"
+pub struct Sdrtcpcli {
+    tcpstream: TcpStream,
+}
+
+impl Sdrtcpcli {
+    fn new(ip_port: &str) -> Sdrtcpcli {
+        Sdrtcpcli { tcpstream: TcpStream::connect(ip_port).unwrap() }
+    }
+
+    pub fn get(&mut self) -> Vec<Complex<f32>> {
+        let mut resvec: Vec<Complex<f32>> = vec![];
+        let mut buffer = [0u8; 1<<13];
+        self.tcpstream.read(&mut buffer).unwrap();
+        for i in (0..buffer.len()).step_by(2) {
+            resvec.push( Complex::new(buffer[i] as f32, buffer[i+1] as f32) );
+        }
+        return resvec;
+    }
 }
