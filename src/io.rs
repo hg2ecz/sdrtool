@@ -8,13 +8,9 @@ pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     let mut resvec: Vec<Complex<f32>> = vec![];
     io::stdin().read(&mut buffer).unwrap();
     for i in (0..buffer.len()).step_by(2) {
-        resvec.push( Complex::new(buffer[i] as f32, buffer[i+1] as f32) );
+        resvec.push( Complex::new(buffer[i] as f32 - std::u8::MAX as f32/2., buffer[i+1] as f32 - std::u8::MAX as f32/2.) );
     }
     return resvec;
-}
-
-pub fn f32_to_i16(sound: &Vec<f32>) -> Vec<i16> {
-    sound.iter().map(|&x| x as i16).collect()
 }
 
 pub fn write_stdout_i16(soundout: &Vec<i16>) {
@@ -41,7 +37,7 @@ impl Sdrtcpcli {
         let mut buffer = [0u8; 1<<13];
         self.tcpstream.read(&mut buffer).unwrap();
         for i in (0..buffer.len()).step_by(2) {
-            resvec.push( Complex::new(buffer[i] as f32, buffer[i+1] as f32) );
+            resvec.push( Complex::new(buffer[i] as f32 - std::u8::MAX as f32/2., buffer[i+1] as f32 - std::u8::MAX as f32/2.) );
         }
         return resvec;
     }
