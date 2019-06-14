@@ -38,7 +38,7 @@ pub fn calc_coeff(cutoff_rate: f32, transition_bw: f32, window: Window) -> Vec<f
         firtaps[middle-i] = firtaps[middle+i];
         sum += firtaps[middle-i] + firtaps[middle+i];
     }
-    for i in 0..taps_len {
+    for i in 0..firtaps.len() {
         firtaps[i] /= sum;
     }
     return firtaps;
@@ -80,7 +80,7 @@ impl Sdrfilter {
     }
 
     pub fn mixer_setfreq(&mut self, frequency: f64, samplerate: u32, phasereset: bool) {
-        let fpsr: f64 = frequency / samplerate as f64;
+        let fpsr: f64 = -2. * std::f64::consts::PI * frequency / samplerate as f64;
         self.oscillator_phase = Complex::new(fpsr.cos(), fpsr.sin());
         if phasereset {
             self.oscillator = Complex::new(1., 0.);
