@@ -10,6 +10,7 @@ pub struct Sdrdemod {
     decimate: usize,
     decimate_pos: usize,
 
+    demod_gain: f32,
     deemp_last_output: f32,
 }
 
@@ -22,8 +23,13 @@ impl Sdrdemod {
             coeff: coeff.clone(),
             decimate: decimate,
             decimate_pos: 0,
+            demod_gain: 0.5,
             deemp_last_output: 0.,
         }
+    }
+
+    pub fn set_gain(&mut self, gain_decibel: f32) {
+        self.demod_gain = 10.0f32.powf(gain_decibel/20.) / 2.;
     }
 
     pub fn fmdemod(&mut self, sample: &Vec<Complex<f32>>) -> Vec<f32> {
@@ -31,7 +37,7 @@ impl Sdrdemod {
         for &signal in sample {
             output.push( (   self.fm_z1.re * (signal.im - self.fm_z2.im)
                            - self.fm_z1.im * (signal.re - self.fm_z2.re)
-                         ) * 1./3. );
+                         ) * self.demod_gain );
             self.fm_z2 = self.fm_z1;
             self.fm_z1 = signal;
         }

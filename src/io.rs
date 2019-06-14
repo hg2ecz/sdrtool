@@ -13,11 +13,12 @@ pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     return resvec;
 }
 
-pub fn write_stdout_i16(soundout: &Vec<i16>) {
+pub fn write_stdout_i16(soundout: &Vec<f32>) {
     let mut outbytes = vec![];
     for x in soundout {
-        outbytes.push((x & 0xff) as u8);
-        outbytes.push((x >> 8) as u8);
+        let xi = *x as i16;
+        outbytes.push((xi & 0xff) as u8);
+        outbytes.push((xi >> 8) as u8);
     }
     io::stdout().write_all(&outbytes).unwrap();
 }
