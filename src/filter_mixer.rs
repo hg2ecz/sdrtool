@@ -65,7 +65,7 @@ impl Sdrfilter {
              coeff: coeff.clone(),
              decimate: decimate,
              oscillator: Complex::new(1., 0.),
-             oscillator_phase: Complex::new(0., 0.),
+             oscillator_phase: Complex::new(1., 0.),
         }
     }
 

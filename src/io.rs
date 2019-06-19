@@ -42,4 +42,8 @@ impl Sdrtcpcli {
         }
         return resvec;
     }
+
+    pub fn write_u8(&mut self, data: &[u8]) {
+        self.tcpstream.write(&data).unwrap();
+    }
 }
