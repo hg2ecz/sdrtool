@@ -28,8 +28,8 @@ impl Sdrdemod {
         }
     }
 
-    pub fn set_gain(&mut self, gain_decibel: f32) {
-        self.demod_gain = 10.0f32.powf(gain_decibel/20.) / 2.;
+    pub fn set_gain(&mut self, gain_decibel: f64) {
+        self.demod_gain = 10.0f32.powf(gain_decibel as f32/20.) / 2.;
     }
 
     pub fn fmdemod(&mut self, sample: &Vec<Complex<f32>>) -> Vec<f32> {
