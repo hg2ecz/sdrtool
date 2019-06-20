@@ -25,15 +25,14 @@ impl CmdIn {
         if let Ok(val) = self.rx.recv_timeout(d) {
             let s_in = val.unwrap();    // get...
             let s_in = s_in.trim_end();
-            let c: char = s_in.chars().next().unwrap();
-            let s: &str = &s_in[1..];
-            if let Ok(sf64) = s.parse() {
-                Some((c, sf64))
-            } else {
-                None
+            if s_in.len() > 1 {
+                let c: char = s_in.chars().next().unwrap();
+                let s: &str = &s_in[1..];
+                if let Ok(sf64) = s.parse() {
+                    return Some((c, sf64));
+                }
             }
-        } else {
-            None
         }
+        None   // if not Some(...)
     }
 }
