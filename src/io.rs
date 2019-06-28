@@ -3,6 +3,7 @@ use num_complex::Complex;
 use std::io::{self, Read, Write};
 use std::net::{TcpStream};
 
+/// ```read [u8; 8192] from stdin and convert to Vec<Complex<f32>>```
 pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     let mut buffer = [0u8; 1<<13];
     let mut resvec: Vec<Complex<f32>> = vec![];
@@ -13,6 +14,7 @@ pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     return resvec;
 }
 
+/// ```convert &Vec<f32> to Vec<i16> and write to stdout```
 pub fn write_stdout_i16(soundout: &Vec<f32>) {
     let mut outbytes = vec![];
     for x in soundout {
@@ -24,6 +26,7 @@ pub fn write_stdout_i16(soundout: &Vec<f32>) {
 }
 
 // Parameter: "ipaddress:port"
+/// ```TCP client (read_u8, write_u8)```
 pub struct Sdrtcpcli {
     tcpstream: TcpStream,
 }

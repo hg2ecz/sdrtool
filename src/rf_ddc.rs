@@ -110,7 +110,8 @@ impl Rfddc {
         return resvec;
     }
 
-    pub fn decimate_mixer(&mut self, sample: &Vec<Complex<f32>>) -> Vec<Complex<f32>> {
+    // mixer & decimate
+    pub fn ddc(&mut self, sample: &Vec<Complex<f32>>) -> Vec<Complex<f32>> {
         let mut resvec = vec![];
         if self.decimate > self.coeff.len() { return resvec; }
         for i in 0..sample.len() {

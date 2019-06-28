@@ -1,6 +1,30 @@
 #![allow(dead_code)]
 use num_complex::Complex;
 
+/** A minimal FM demodulator example (RF data from rtl_tcp -s 2.4M -f 103.3M):
+
+```
+use sdrtool::*;
+
+fn main() {
+    let rfcoeff = calc_coeff(240_000./2_400_000., 0.05, Window::Hamming);
+    let audiocoeff = calc_coeff(15_000./240_000., 0.05, Window::Hamming);
+
+    let mut tcpcli = Sdrtcpcli::new("localhost:1234");
+    let mut rfddc = Rfddc::new(&rfcoeff, 10);       // coeffvec & decimate_factor
+    let mut demod = Sdrdemod::new(&audiocoeff, 5);     // coeffvec & decimate_factor
+
+    loop {
+        let rfdata = tcpcli.read_u8();
+        let rfif = rfddc.ddc(&rfdata);
+        let audio = demod.fmdemod(&rfif);
+        let audio = demod.deemphasis_wfm(&audio, 50.0e-6, 240_000);
+        let audio = demod.decimate_audio(&audio);
+        write_stdout_i16(&audio);
+    }
+}
+```
+**/
 pub struct Sdrdemod {
     fm_z1: Complex<f32>,
     fm_z2: Complex<f32>,
