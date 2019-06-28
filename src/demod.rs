@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 use num_complex::Complex;
 
-/** A minimal FM demodulator example (RF data from rtl_tcp -s 2.4M -f 103.3M):
+/** Demodulator (FM, ...), deemphasis, audio decimator
+
+A minimal FM demodulator example (RF data from rtl_tcp -s 2.4M -f 103.3M):
 
 ```
 use sdrtool::*;
