@@ -46,7 +46,7 @@ pub fn calc_coeff(cutoff_rate: f32, transition_bw: f32, window: Window) -> Vec<f
 
 // ---------------------------------------------------------------
 
-pub struct Sdrfilter {
+pub struct Rfddc {
     samplefirbuf: Vec<Complex<f32>>,      // for fir func
     sampledecimbuf: Vec<Complex<f32>>,    // for decimate func
     sampledecimmixbuf: Vec<Complex<f32>>, // for decimate_mix func
@@ -56,9 +56,9 @@ pub struct Sdrfilter {
     oscillator_phase: Complex<f64>,
 }
 
-impl Sdrfilter {
-    pub fn new(coeff: &Vec<f32>, decimate: usize) -> Sdrfilter {
-        Sdrfilter {
+impl Rfddc {
+    pub fn new(coeff: &Vec<f32>, decimate: usize) -> Rfddc {
+        Rfddc {
              samplefirbuf: Vec::new(),
              sampledecimbuf: Vec::new(),
              sampledecimmixbuf: Vec::new(),
