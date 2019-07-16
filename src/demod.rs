@@ -52,7 +52,7 @@ pub struct Sdrdemod {
 impl Sdrdemod {
     pub fn new(samplerate: u32, decimfactor: usize, transition_bw: f32, window: &super::Window, audiofreq: u32) -> Sdrdemod {
 
-        let cutoff_rate = 1./decimfactor as f32;
+        let cutoff_rate = audiofreq as f32;
         let coeff = super::calc_coeff(cutoff_rate, transition_bw, window);
 
         Sdrdemod {
