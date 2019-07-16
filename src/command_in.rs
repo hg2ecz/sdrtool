@@ -16,7 +16,7 @@ impl CmdIn {
                 tx.send(line).unwrap();
             }
         });
-        return CmdIn {rx: rx};
+        CmdIn {rx}
     }
 
     // f-0.3  --> set mixfreq to -0.3 MHz
@@ -34,5 +34,11 @@ impl CmdIn {
             }
         }
         None   // if not Some(...)
+    }
+}
+
+impl Default for CmdIn {
+    fn default() -> Self {
+        Self::new()
     }
 }

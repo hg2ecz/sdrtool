@@ -7,15 +7,15 @@ use std::net::{TcpStream};
 pub fn read_stdin_u8() -> Vec<Complex<f32>> {
     let mut buffer = [0u8; 1<<13];
     let mut resvec: Vec<Complex<f32>> = vec![];
-    io::stdin().read(&mut buffer).unwrap();
+    io::stdin().read_exact(&mut buffer).unwrap();
     for i in (0..buffer.len()).step_by(2) {
-        resvec.push( Complex::new(buffer[i] as f32 - std::u8::MAX as f32/2., buffer[i+1] as f32 - std::u8::MAX as f32/2.) );
+        resvec.push( Complex::new(f32::from(buffer[i]) - f32::from(std::u8::MAX)/2., f32::from(buffer[i+1]) - f32::from(std::u8::MAX)/2.) );
     }
-    return resvec;
+    resvec
 }
 
-/// ```convert &Vec<f32> to Vec<i16> and write to stdout```
-pub fn write_stdout_i16(soundout: &Vec<f32>) {
+/// ```convert &[f32] to Vec<i16> and write to stdout```
+pub fn write_stdout_i16(soundout: &[f32]) {
     let mut outbytes = vec![];
     for x in soundout {
         let xi = *x as i16;
@@ -39,14 +39,14 @@ impl Sdrtcpcli {
     pub fn read_u8(&mut self) -> Vec<Complex<f32>> {
         let mut resvec: Vec<Complex<f32>> = vec![];
         let mut buffer = [0u8; 1<<13];
-        self.tcpstream.read(&mut buffer).unwrap();
+        self.tcpstream.read_exact(&mut buffer).unwrap();
         for i in (0..buffer.len()).step_by(2) {
-            resvec.push( Complex::new(buffer[i] as f32 - std::u8::MAX as f32/2., buffer[i+1] as f32 - std::u8::MAX as f32/2.) );
+            resvec.push( Complex::new(f32::from(buffer[i]) - f32::from(std::u8::MAX)/2., f32::from(buffer[i+1]) - f32::from(std::u8::MAX)/2.) );
         }
-        return resvec;
+        resvec
     }
 
     pub fn write_u8(&mut self, data: &[u8]) {
-        self.tcpstream.write(&data).unwrap();
+        self.tcpstream.write_all(&data).unwrap();
     }
 }

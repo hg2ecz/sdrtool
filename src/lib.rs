@@ -4,6 +4,9 @@ pub mod io;
 /// i16 to f32 and other data conversion tool
 pub mod convert;
 
+/// coeff calculator, ...
+pub mod fir_util;
+
 /// RF mixer with oscillator and digital down converter with decimator
 pub mod rf_ddc;
 
@@ -18,3 +21,5 @@ pub use rf_ddc::*;
 pub use demod::*;
 pub use convert::*;
 pub use command_in::*;
+
+pub use fir_util::*;
