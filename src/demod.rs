@@ -60,7 +60,7 @@ impl Sdrdemod {
             fm_z2: Complex::new(0., 0.),
             samplerate,
             sampledecimbuf: vec![],
-            coeff: coeff.to_vec(),
+            coeff,
             decimfactor,
             decimate_pos: 0,
             demod_gain: 0.5,
