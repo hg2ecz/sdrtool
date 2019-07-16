@@ -52,7 +52,7 @@ pub struct Sdrdemod {
 impl Sdrdemod {
     pub fn new(samplerate: u32, decimfactor: usize, transition_bw: f32, window: &super::Window, audiofreq: u32) -> Sdrdemod {
 
-        let cutoff_rate = audiofreq as f32;
+        let cutoff_rate = audiofreq as f32/samplerate as f32;
         let coeff = super::calc_coeff(cutoff_rate, transition_bw, window);
 
         Sdrdemod {
@@ -90,11 +90,13 @@ impl Sdrdemod {
         if self.decimfactor > self.coeff.len() { return resvec; }
         self.sampledecimbuf.extend(sample);
         let mut pos = 0;
-        for i in (self.decimate_pos..self.sampledecimbuf.len()-self.coeff.len()).step_by(self.decimfactor) {
-            resvec.push ( self.sampledecimbuf[i..i+self.coeff.len()].iter().zip(&self.coeff).map(|(sa, co)| sa * co).sum() );
-            pos=i;
+        if self.sampledecimbuf.len() > self.coeff.len() {
+            for i in (self.decimate_pos..self.sampledecimbuf.len()-self.coeff.len()).step_by(self.decimfactor) {
+                resvec.push ( self.coeff.iter().zip(&self.sampledecimbuf[i..]).map(|(co, sa)| sa * co).sum() );
+                pos=i;
+            }
+            self.sampledecimbuf.drain(..pos+self.decimfactor);
         }
-        self.sampledecimbuf.drain(..pos+self.decimfactor);
         resvec
     }
 
@@ -107,6 +109,7 @@ impl Sdrdemod {
         let dt = 1.0/self.samplerate as f32;
         let alpha = dt/(tau+dt);
         let mut output = vec![];
+        if input.is_empty() { return output };
         output.push ( alpha*input[0]+(1.-alpha)*self.deemp_last_output );
         for i in 1..input.len() { //@deemphasis_wfm_ff
             output.push( alpha*input[i]+(1.-alpha)*output[i-1] ); //this is the simplest IIR LPF

@@ -90,12 +90,13 @@ impl Rfddc {
             self.sampledecimmixbuf.extend(sample);
         }
         let mut pos = 0;
-        for i in (0..self.sampledecimmixbuf.len()-self.coeff.len()).step_by(self.decimfactor) {
-            resvec.push ( self.coeff.iter().zip(&self.sampledecimmixbuf[i..]).map(|(co, sa)| co * sa).sum() );
-            pos=i;
+	if self.sampledecimmixbuf.len() > self.coeff.len()+self.decimfactor {
+    	    for i in (0..=self.sampledecimmixbuf.len()-self.coeff.len()-self.decimfactor).step_by(self.decimfactor) {
+                resvec.push ( self.coeff.iter().zip(&self.sampledecimmixbuf[i..]).map(|(co, sa)| co * sa).sum() );
+                pos=i;
+            }
+            self.sampledecimmixbuf.drain(..pos+self.decimfactor);
         }
-        self.sampledecimmixbuf.drain(..pos+self.decimfactor);
-
         resvec
     }
 }
