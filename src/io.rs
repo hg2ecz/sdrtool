@@ -1,15 +1,18 @@
 #![allow(dead_code)]
 use num_complex::Complex;
 use std::io::{self, Read, Write};
-use std::net::{TcpStream};
+use std::net::TcpStream;
 
 /// ```read [u8; 8192] from stdin and convert to Vec<Complex<f32>>```
 pub fn read_stdin_u8() -> Vec<Complex<f32>> {
-    let mut buffer = [0u8; 1<<13];
+    let mut buffer = [0u8; 1 << 13];
     let mut resvec: Vec<Complex<f32>> = vec![];
     io::stdin().read_exact(&mut buffer).unwrap();
     for i in (0..buffer.len()).step_by(2) {
-        resvec.push( Complex::new(f32::from(buffer[i]) - f32::from(std::u8::MAX)/2., f32::from(buffer[i+1]) - f32::from(std::u8::MAX)/2.) );
+        resvec.push(Complex::new(
+            f32::from(buffer[i]) - f32::from(std::u8::MAX) / 2.,
+            f32::from(buffer[i + 1]) - f32::from(std::u8::MAX) / 2.,
+        ));
     }
     resvec
 }
@@ -33,15 +36,20 @@ pub struct Sdrtcpcli {
 
 impl Sdrtcpcli {
     pub fn new(ip_port: &str) -> Sdrtcpcli {
-        Sdrtcpcli { tcpstream: TcpStream::connect(ip_port).unwrap() }
+        Sdrtcpcli {
+            tcpstream: TcpStream::connect(ip_port).unwrap(),
+        }
     }
 
     pub fn read_u8(&mut self) -> Vec<Complex<f32>> {
         let mut resvec: Vec<Complex<f32>> = vec![];
-        let mut buffer = [0u8; 1<<13];
+        let mut buffer = [0u8; 1 << 13];
         self.tcpstream.read_exact(&mut buffer).unwrap();
         for i in (0..buffer.len()).step_by(2) {
-            resvec.push( Complex::new(f32::from(buffer[i]) - f32::from(std::u8::MAX)/2., f32::from(buffer[i+1]) - f32::from(std::u8::MAX)/2.) );
+            resvec.push(Complex::new(
+                f32::from(buffer[i]) - f32::from(std::u8::MAX) / 2.,
+                f32::from(buffer[i + 1]) - f32::from(std::u8::MAX) / 2.,
+            ));
         }
         resvec
     }

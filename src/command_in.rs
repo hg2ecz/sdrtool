@@ -1,7 +1,7 @@
 use std::io::{self, BufRead};
+use std::sync::mpsc;
 use std::thread;
 use std::time;
-use std::sync::mpsc;
 
 pub struct CmdIn {
     rx: mpsc::Receiver<Result<String, io::Error>>,
@@ -16,14 +16,14 @@ impl CmdIn {
                 tx.send(line).unwrap();
             }
         });
-        CmdIn {rx}
+        CmdIn { rx }
     }
 
     // f-0.3  --> set mixfreq to -0.3 MHz
     pub fn get(&self) -> Option<(char, f64)> {
         let d = time::Duration::from_millis(0);
         if let Ok(val) = self.rx.recv_timeout(d) {
-            let s_in = val.unwrap();    // get...
+            let s_in = val.unwrap(); // get...
             let s_in = s_in.trim_end();
             if s_in.len() > 1 {
                 let c: char = s_in.chars().next().unwrap();
@@ -33,7 +33,7 @@ impl CmdIn {
                 }
             }
         }
-        None   // if not Some(...)
+        None // if not Some(...)
     }
 }
 
