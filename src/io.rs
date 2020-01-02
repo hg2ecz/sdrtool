@@ -71,7 +71,7 @@ impl Sdrtcpcli {
         resvec
     }
 
-    pub fn read_f32(&mut self) -> Vec<Complex<f32>> {
+/*    pub fn read_f32(&mut self) -> Vec<Complex<f32>> {
         let mut resvec: Vec<Complex<f32>> = vec![];
         let mut buffer = [0u8; 1 << (13+2)];
         self.tcpstream.read_exact(&mut buffer).unwrap();
@@ -87,7 +87,7 @@ impl Sdrtcpcli {
         }
         resvec
     }
-
+*/
     pub fn write_u8(&mut self, data: &[u8]) {
         self.tcpstream.write_all(&data).unwrap();
     }
