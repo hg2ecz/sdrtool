@@ -28,7 +28,7 @@ This example code works with MSI SDR dongle:
 2. ...
 3. ...
 4. ./miri_sdr -s 2400000 -f 103300000 - | nc -l -p 1234
-5. modify the examples/fmdemod/src/main.rs:
+5. modify the examples/fmdemod/main.rs:
 
      ~~let rfdata = tcpcli.read_u8();~~
 
