@@ -32,8 +32,9 @@ fn main() {
     }
 
     let ip_port = &args[1];
-    let udpsocket = net::UdpSocket::bind("[::1]:0").unwrap();
+    let udpsocket = net::UdpSocket::bind("[::]:0").unwrap();
     udpsocket.connect(ip_port).unwrap();
+    udpsocket.send(&[]).unwrap(); // send connect
 
     let pcm = PCM::new("default", Direction::Playback, false).unwrap();
     let sndio = sound_init(&pcm, 48000, 1);
@@ -41,21 +42,6 @@ fn main() {
     let mut sndbuf: Vec<i16> = vec![];
     let mut buf_in = [0u8; 1 << 13];
     let mut buf: Vec<u8> = vec![];
-
-    let mut allread = 0;
-    loop {
-        // reduce buffering-delay, empty TCP channel
-        if let Ok(size) = udpsocket.recv(&mut buf_in) {
-            allread += size;
-            if size < 20 {
-                break;
-            }
-        }
-    }
-    if allread % 2 == 1 {
-        // odd
-        buf.push(0);
-    }
 
     let cmd = command_in::CmdIn::new();
 
