@@ -1,4 +1,3 @@
-use std::io::{Read, Write};
 use std::net;
 
 use alsa::pcm::{Access, Format, HwParams, PCM};
@@ -33,7 +32,8 @@ fn main() {
     }
 
     let ip_port = &args[1];
-    let mut tcp = net::TcpStream::connect(ip_port).unwrap();
+    let udpsocket = net::UdpSocket::bind("[::1]:0").unwrap();
+    udpsocket.connect(ip_port).unwrap();
 
     let pcm = PCM::new("default", Direction::Playback, false).unwrap();
     let sndio = sound_init(&pcm, 48000, 1);
@@ -45,7 +45,7 @@ fn main() {
     let mut allread = 0;
     loop {
         // reduce buffering-delay, empty TCP channel
-        if let Ok(size) = tcp.read(&mut buf_in) {
+        if let Ok(size) = udpsocket.recv(&mut buf_in) {
             allread += size;
             if size < 20 {
                 break;
@@ -60,7 +60,7 @@ fn main() {
     let cmd = command_in::CmdIn::new();
 
     loop {
-        if let Ok(size) = tcp.read(&mut buf_in) {
+        if let Ok(size) = udpsocket.recv(&mut buf_in) {
             for &d in buf_in.iter().take(size) {
                 buf.push(d);
             }
@@ -79,7 +79,7 @@ fn main() {
             let mut data = data_in;
             data.push('\n');
             data.push('\0');
-            tcp.write_all(data.as_bytes()).unwrap();
+            udpsocket.send(data.as_bytes()).unwrap();
         }
     }
 }

@@ -1,38 +1,6 @@
 #![allow(dead_code)]
 use num_complex::Complex;
 
-/** Demodulator (FM, ...), deemphasis, audio decimator
-
-A minimal FM demodulator example (RF data from rtl_tcp -s 2.4M -f 103.3M):
-
-```
-use sdrtool::*;
-
-fn main() {
-    let samplerate: u32 = 2_400_000;
-    let decimfactor: u32 = 10;
-    let transition_bw = 0.05;
-    let window = Window::Hamming;
-
-    let if_samplerate = samplerate/decimfactor;
-    let audio_decimfactor = 5;
-    let audiofreq = 15_000;    // low pass filter
-
-    let mut tcpcli = Sdrtcpcli::new("localhost:1234");
-    let mut rfddc = Rfddc::new(samplerate, decimfactor, transition_bw, &window);
-    let mut demod = Sdrdemod::new(if_samplerate, audio_decimfactor, transition_bw, &window, audiofreq);
-
-    loop {
-        let rfdata = tcpcli.read_u8();
-        let rfif = rfddc.ddc(&rfdata);
-        let audio = demod.fmdemod(&rfif);
-        let audio = demod.deemphasis_wfm(&audio, 50.0e-6);
-        let audio = demod.decimate_audio(&audio);
-        write_stdout_i16(&audio);
-    }
-}
-```
-**/
 pub struct Sdrdemod {
     fm_z1: Complex<f32>,
     fm_z2: Complex<f32>,

@@ -29,7 +29,7 @@ fn main() {
 
     loop {
         let rfdata = tcpcli.read_u8(); // rtl_sdr format
-        // let rfdata = tcpcli.read_s16(); // miri_sdr format
+                                       // let rfdata = tcpcli.read_s16(); // miri_sdr format
         let rfif = rfddc.ddc(&rfdata); // mix & decimate
         let audio = demod.fmdemod(&rfif);
         let audio = demod.deemphasis_wfm(&audio, 50.0e-6);
