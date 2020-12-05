@@ -116,6 +116,7 @@ impl Sndudpsrv {
         if let Ok((_rxlen, src)) = self.udpsocket.recv_from(&mut buf) {
             if !self.udpclients.contains(&src) {
                 self.udpclients.push(src);
+                println!("New client connected from {}", src);
             }
         }
 
