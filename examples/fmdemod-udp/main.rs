@@ -36,24 +36,9 @@ fn main() {
         let audio = demod.deemphasis_wfm(&audio, 50.0e-6);
         let audio = demod.decimate_audio(&audio);
         //write_stdout_i16(&audio);
-        udpsrv.write(&audio);
+        let udp_cmd = udpsrv.write(&audio); // write to sndclient & get cmd from sndclient
 
-        if let Some((c, cf64)) = cmd.get() {
-            // if new command ...
-            match c {
-                'F' => {
-                    let mut cmdbytes: Vec<u8> = vec![0x01]; // RTL_TCP set Freq
-                    let f = (1_000_000. * cf64) as u32;
-                    cmdbytes.push((f >> 24) as u8);
-                    cmdbytes.push((f >> 16) as u8);
-                    cmdbytes.push((f >> 8) as u8);
-                    cmdbytes.push(f as u8);
-                    tcpcli.write_u8(&cmdbytes);
-                }
-                'f' => rfddc.mixer_setfreq(1_000_000. * cf64, true), // mix freq Hz
-                'g' => demod.set_gain(cf64),                         // output gain ... decibel
-                _ => {}
-            }
-        }
+        set_rtlsdr(&mut tcpcli, &mut rfddc, &mut demod, cmd.get_stdin()); // cmd from fmdemod-udp console, retval: Option<(char, f64)>
+        set_rtlsdr(&mut tcpcli, &mut rfddc, &mut demod, udp_cmd); // cmd from sndclient console, retval: Option<(char, f64)>
     }
 }
