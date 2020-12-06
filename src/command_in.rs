@@ -20,7 +20,7 @@ impl CmdIn {
     }
 
     // f-0.3  --> set mixfreq to -0.3 MHz
-    pub fn get(&self) -> Option<(char, f64)> {
+    pub fn get_stdin(&self) -> Option<(char, f64)> {
         let d = time::Duration::from_millis(0);
         if let Ok(val) = self.rx.recv_timeout(d) {
             let s_in = val.unwrap(); // get...

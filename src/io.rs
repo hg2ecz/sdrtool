@@ -99,6 +99,7 @@ impl Sdrtcpcli {
 pub struct Sndudpsrv {
     udpsocket: UdpSocket,
     udpclients: Vec<SocketAddr>,
+    cmdstr: Vec<u8>,
 }
 
 impl Sndudpsrv {
@@ -106,16 +107,33 @@ impl Sndudpsrv {
         let sock = Sndudpsrv {
             udpsocket: UdpSocket::bind(format!("[::]:{}", port)).unwrap(),
             udpclients: vec![],
+            cmdstr: vec![],
         };
         sock.udpsocket.set_nonblocking(true).unwrap();
         sock
     }
 
-    pub fn write(&mut self, soundout: &[f32]) {
+    pub fn write(&mut self, soundout: &[f32]) -> Option<(char, f64)> {
+        let mut res = None;
         let mut buf = [0; 10];
-        if let Ok((_rxlen, src)) = self.udpsocket.recv_from(&mut buf) {
+        if let Ok((rxlen, src)) = self.udpsocket.recv_from(&mut buf) {
             if !self.udpclients.contains(&src) {
                 self.udpclients.push(src);
+                println!("New client connected from {}", src);
+            }
+            self.cmdstr.extend(&buf[0..rxlen]);
+            if buf[0..rxlen].contains(&b'\n') && self.cmdstr.len() > 1 {
+                //println!("{} Remoteraw: {:?}", src, self.cmdstr);
+                if let Ok(cmd) = String::from_utf8(self.cmdstr.clone()) {
+                    let cmd = cmd.trim_end();
+                    if let Some(c) = cmd.chars().next() {
+                        if let Ok(sf64) = cmd[1..].parse() {
+                            println!("{} Remotecmd: {}", src, cmd);
+                            res = Some((c, sf64));
+                        }
+                    }
+                }
+                self.cmdstr.clear();
             }
         }
 
@@ -137,5 +155,6 @@ impl Sndudpsrv {
                 self.udpclients.swap_remove(idx);
             }
         }
+        res
     }
 }
