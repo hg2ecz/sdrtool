@@ -1,4 +1,3 @@
-//use num_complex::Complex;
 use sdrtool::*;
 
 fn main() {
@@ -36,9 +35,25 @@ fn main() {
         let audio = demod.deemphasis_wfm(&audio, 50.0e-6);
         let audio = demod.decimate_audio(&audio);
         //write_stdout_i16(&audio);
-        let udp_cmd = udpsrv.write(&audio); // write to sndclient & get cmd from sndclient
 
-        set_rtlsdr(&mut tcpcli, &mut rfddc, &mut demod, cmd.get_stdin()); // cmd from fmdemod-udp console, retval: Option<(char, f64)>
-        set_rtlsdr(&mut tcpcli, &mut rfddc, &mut demod, udp_cmd); // cmd from sndclient console, retval: Option<(char, f64)>
+        // write to sndclient & get cmd from sndclient --> Option<(char, f64)>
+        if let Some((c, fval)) = udpsrv.write(&audio) {
+            match c {
+                'F' => set_rtlsdr(&mut tcpcli, c, fval),
+                'f' => rfddc.mixer_setfreq(1_000_000. * fval, true),
+                'g' => demod.set_gain(fval),
+                _ => (),
+            }
+        }
+
+        // set from serverconsole
+        if let Some((c, fval)) = cmd.get_stdin() {
+            match c {
+                'F' => set_rtlsdr(&mut tcpcli, c, fval),
+                'f' => rfddc.mixer_setfreq(1_000_000. * fval, true),
+                'g' => demod.set_gain(fval),
+                _ => (),
+            }
+        }
     }
 }
