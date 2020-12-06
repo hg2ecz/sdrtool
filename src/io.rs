@@ -43,7 +43,7 @@ impl Sdrtcpcli {
 
     pub fn read_u8(&mut self) -> Vec<Complex<f32>> {
         let mut resvec: Vec<Complex<f32>> = vec![];
-        let mut buffer = [0u8; 1 << 13];
+        let mut buffer = [0u8; 1 << 15];
         self.tcpstream.read_exact(&mut buffer).unwrap();
         for i in (0..buffer.len()).step_by(2) {
             resvec.push(Complex::new(

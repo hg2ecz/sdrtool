@@ -56,7 +56,7 @@ impl Rfddc {
     }
 
     pub fn mixer_setfreq(&mut self, frequency: f64, phasereset: bool) {
-        self.is_mix = frequency > 0.;
+        self.is_mix = frequency != 0.;
         let fpsr: f64 = -2. * std::f64::consts::PI * frequency / f64::from(self.samplerate);
         self.oscillator_phase = Complex::new(fpsr.cos(), fpsr.sin());
         if phasereset {
@@ -65,14 +65,14 @@ impl Rfddc {
     }
 
     pub fn mixer(&mut self, sample: &[Complex<f32>]) -> Vec<Complex<f32>> {
-        let mut resvec = vec![];
-        for s in sample {
-            let tmp_osc32: Complex<f32> =
-                Complex::new(self.oscillator.re as f32, self.oscillator.im as f32);
-            resvec.push(s * tmp_osc32);
-            self.oscillator *= self.oscillator_phase;
-        }
-        resvec
+        sample
+            .iter()
+            .map(|s| {
+                let res = s * Complex::new(self.oscillator.re as f32, self.oscillator.im as f32);
+                self.oscillator *= self.oscillator_phase;
+                res
+            })
+            .collect()
     }
 
     pub fn decimate(&mut self, sample: &[Complex<f32>]) -> Vec<Complex<f32>> {
@@ -82,7 +82,7 @@ impl Rfddc {
         }
         self.sampledecimbuf.extend(sample);
         let mut pos = 0;
-        for i in (0..self.sampledecimbuf.len() - self.coeff.len()).step_by(self.decimfactor) {
+        for i in (0..=self.sampledecimbuf.len() - self.coeff.len()).step_by(self.decimfactor) {
             resvec.push(
                 self.coeff
                     .iter()
@@ -103,17 +103,22 @@ impl Rfddc {
             return resvec;
         }
         if self.is_mix {
-            for s in sample {
-                let tmp_osc32: Complex<f32> =
-                    Complex::new(self.oscillator.re as f32, self.oscillator.im as f32);
-                resvec.push(s * tmp_osc32);
-                self.oscillator *= self.oscillator_phase;
-            }
+            let mixtmp: Vec<Complex<f32>> = sample
+                .iter()
+                .map(|s| {
+                    let res =
+                        s * Complex::new(self.oscillator.re as f32, self.oscillator.im as f32);
+                    self.oscillator *= self.oscillator_phase;
+                    res
+                })
+                .collect();
+            self.sampledecimmixbuf.extend(&mixtmp[..]);
         } else {
             self.sampledecimmixbuf.extend(sample);
         }
-        let mut pos = 0;
+
         if self.sampledecimmixbuf.len() > self.coeff.len() + self.decimfactor {
+            let mut pos = 0;
             for i in (0..=self.sampledecimmixbuf.len() - self.coeff.len() - self.decimfactor)
                 .step_by(self.decimfactor)
             {
