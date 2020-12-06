@@ -60,12 +60,10 @@ fn main() {
             sndbuf.clear();
         }
         // command to server
-        if let Some(data_in) = cmd.getstring() {
+        if let Some(line) = cmd.getstring() {
             // if new command ...
-            let mut data = data_in;
-            data.push('\n');
-            data.push('\0');
-            udpsocket.send(data.as_bytes()).unwrap();
+            let line = line + "\n";
+            udpsocket.send(line.as_bytes()).unwrap();
         }
     }
 }
