@@ -27,6 +27,5 @@ impl CmdIn {
         } else {
             None
         }
-
     }
 }
